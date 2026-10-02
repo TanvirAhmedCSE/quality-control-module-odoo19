@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_quality_root"
+              name="Quality Check"
+              sequence="1"
+    />
+    <menuitem id="menu_quality_check"
+              name="Quality Checks"
+              parent="menu_quality_root"
+              action="action_quality_check"
+    />
+</odoo>

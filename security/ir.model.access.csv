@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_quality_check_user,quality.check.user,model_quality_check,group_quality_check_user,1,1,1,0
+access_quality_check_line_user,quality.check.line.user,model_quality_check_line,group_quality_check_user,1,1,1,1
+access_quality_check_remark_user,quality.check.remark.user,model_quality_check_remark,group_quality_check_user,1,1,1,1
+
+access_quality_check_supervisor,quality.check.supervisor,model_quality_check,group_quality_check_supervisor,1,1,1,0
+access_quality_check_line_supervisor,quality.check.line.supervisor,model_quality_check_line,group_quality_check_supervisor,1,1,1,1
+access_quality_check_remark_supervisor,quality.check.remark.supervisor,model_quality_check_remark,group_quality_check_supervisor,1,1,1,1
+
+access_quality_check_manager,quality.check.manager,model_quality_check,group_quality_check_manager,1,1,0,1
+access_quality_check_line_manager,quality.check.line.manager,model_quality_check_line,group_quality_check_manager,1,0,0,0
+access_quality_check_remark_manager,quality.check.remark.manager,model_quality_check_remark,group_quality_check_manager,1,1,1,1

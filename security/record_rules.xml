@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- noupdate="0" so rules update on module upgrade -->
+    <data noupdate="0">
+
+        <!-- Supervisor/Manager: all records -->
+        <record id="rule_quality_check_supervisor_all" model="ir.rule">
+            <field name="name">Supervisor/Manager Quality Checks (All Records)</field>
+            <field name="model_id" ref="model_quality_check" />
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(6, 0, [ref('group_quality_check_supervisor'), ref('group_quality_check_manager')])]" />
+        </record>
+
+        <record id="rule_quality_check_line_supervisor_all" model="ir.rule">
+            <field name="name">Supervisor/Manager Quality Check Lines (All Records)</field>
+            <field name="model_id" ref="model_quality_check_line" />
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(6, 0, [ref('group_quality_check_supervisor'), ref('group_quality_check_manager')])]" />
+        </record>
+
+        <record id="rule_quality_check_remark_supervisor_all" model="ir.rule">
+            <field name="name">Supervisor/Manager Quality Check Remarks (All Records)</field>
+            <field name="model_id" ref="model_quality_check_remark" />
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(6, 0, [ref('group_quality_check_supervisor'), ref('group_quality_check_manager')])]" />
+        </record>
+
+        <!-- User: own / additional inspector records only -->
+        <record id="rule_quality_check_user_own" model="ir.rule">
+            <field name="name">User: Own / Additional Inspector Quality Checks</field>
+            <field name="model_id" ref="model_quality_check" />
+            <field name="domain_force">['|', ('inspector_id', '=', user.id), ('additional_inspector_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(6, 0, [ref('group_quality_check_user')])]" />
+        </record>
+
+        <record id="rule_quality_check_line_user_own" model="ir.rule">
+            <field name="name">User: Own / Additional Inspector Quality Check Lines</field>
+            <field name="model_id" ref="model_quality_check_line" />
+            <field name="domain_force">['|', ('line_id.inspector_id', '=', user.id), ('line_id.additional_inspector_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(6, 0, [ref('group_quality_check_user')])]" />
+        </record>
+
+        <record id="rule_quality_check_remark_user_own" model="ir.rule">
+            <field name="name">User: Own / Additional Inspector Quality Check Remarks</field>
+            <field name="model_id" ref="model_quality_check_remark" />
+            <field name="domain_force">['|', ('check_id.inspector_id', '=', user.id), ('check_id.additional_inspector_ids', 'in', [user.id])]</field>
+            <field name="groups" eval="[(6, 0, [ref('group_quality_check_user')])]" />
+        </record>
+
+    </data>
+</odoo>

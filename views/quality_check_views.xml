@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_quality_check_tree" model="ir.ui.view">
+        <field name="name">quality.check.tree</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <!-- Whole row. Red = record is in the current person's own stage (always wins). Green = person is an additional inspector AND record is NOT in own stage. -->
+            <list
+                decoration-danger="state == my_stage"
+                decoration-success="is_additional_inspector and state != my_stage">
+                <field name="my_stage" column_invisible="1" />
+                <field name="is_additional_inspector" column_invisible="1" />
+                <field name="name" />
+                <field name="inspector_id" />
+                <field name="check_date" />
+                <field name="result" />
+                <field name="state" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_quality_check_form" model="ir.ui.view">
+        <field name="name">quality.check.form</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send_to_supervisor" string="Send To Supervisor" type="object"
+                        invisible="state != 'draft' or not can_edit" />
+
+                    <button name="action_reset_to_draft" string="Reset To Draft" type="object"
+                        invisible="state != 'supervisor' or origin_state != 'draft' or my_stage != 'draft' or (inspector_id != uid and not is_additional_inspector)" />
+
+                    <button name="action_send_to_manager" string="Send To Manager"
+                        type="object"
+                        invisible="state != 'supervisor'"
+                        groups="quality_control.group_quality_check_supervisor" />
+
+                    <button name="action_reset_to_draft" string="Recall To Draft" type="object"
+                        invisible="state != 'supervisor' or origin_state != 'draft'"
+                        groups="quality_control.group_quality_check_supervisor" />
+
+                    <button name="action_approved" string="Approve" type="object"
+                        invisible="state != 'manager' or result != 'pass'"
+                        groups="quality_control.group_quality_check_manager" />
+
+                    <button name="action_failed" string="Fail" type="object"
+                        invisible="state != 'manager' or result != 'fail'"
+                        groups="quality_control.group_quality_check_manager" />
+
+                    <button name="action_cancel" string="Cancel" type="object"
+                        invisible="state != 'manager'"
+                        groups="quality_control.group_quality_check_manager" />
+
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <!-- Displaying the generated sequence string as the form header -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="my_stage" invisible="1" />
+                            <field name="is_additional_inspector" invisible="1" />
+                            <field name="can_edit" invisible="1" />
+                            <field name="can_add_remark" invisible="1" />
+                            <field name="origin_state" invisible="1" />
+                            <field name="allowed_inspector_ids" invisible="1" />
+                            <field name="name" readonly="not can_edit or state != origin_state" />
+                            <field name="inspector_id" />
+                            <field name="additional_inspector_ids" widget="many2many_tags"
+                                domain="[('id', 'in', allowed_inspector_ids)]"
+                                readonly="not can_edit or state != origin_state" />
+                        </group>
+                        <group>
+                            <field name="check_date" readonly="not can_edit or state != origin_state" />
+                            <field name="result" readonly="not can_edit" />
+                            <field name="state" readonly="1" />
+                        </group>
+                    </group>
+
+                    <div class="mb-2" invisible="not remarks_html and not can_add_remark">
+                        <field name="show_remarks" widget="remarks_toggle" nolabel="1" />
+                    </div>
+                    <div class="d-flex flex-column gap-2 o_quality_remarks"
+                        invisible="not remarks_html and not can_add_remark">
+                        <field name="remarks_html" nolabel="1" readonly="1"
+                            invisible="not remarks_html" class="w-100" />
+                        <div invisible="not can_add_remark" class="w-100">
+                            <field name="my_remarks_label" nolabel="1" class="fw-bold d-block" />
+                            <field name="my_remarks" nolabel="1"
+                                placeholder="Write your remarks" class="w-100" />
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <page string="Product Line">
+                            <field name="quantity_lines" readonly="not can_edit">
+                                <list string="Product Line" editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="rec_qty" />
+                                    <field name="damage_qty" />
+                                    <field name="remain_qty" force_save="1" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+
+        </field>
+    </record>
+    <record id="action_quality_check" model="ir.actions.act_window">
+        <field name="name">Quality Checks</field>
+        <field name="res_model">quality.check</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

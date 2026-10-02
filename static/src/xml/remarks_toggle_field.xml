@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="quality_control.RemarksToggleField">
+        <button type="button" class="btn btn-secondary" t-ref="root" t-on-click="onClick">
+            <i class="fa me-1" t-att-class="state.shown ? 'fa-eye-slash' : 'fa-eye'" />
+            <t t-if="state.shown">Hide Remarks</t>
+            <t t-else="">Show Remarks</t>
+        </button>
+    </t>
+</templates>
