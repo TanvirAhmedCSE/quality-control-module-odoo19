@@ -162,55 +162,55 @@ Remarks are stored in a dedicated model (`quality.check.remark`) instead of a si
 
 **Main Checker: Quality Checks List (sees only own records and the records as additional inspector himself)**
 
-<img src="mvvbv/1.png" width="100%"/>
+<img src="module screenshots/1.png" width="100%"/>
 
 **Main Checker: Draft with Remarks & QC product lines**
 
-<img src="mvvbv/2.png" width="100%"/>
+<img src="module screenshots/2.png" width="100%"/>
 
 **Additional Inspector: Adds QC product line and Remarks**
 
-<img src="mvvbv/3.png" width="100%"/>
+<img src="module screenshots/3.png" width="100%"/>
 
 **Sent to Supervisor (status moves to Supervisor, Reset To Draft available)**
 
-<img src="mvvbv/4.png" width="100%"/>
+<img src="module screenshots/4.png" width="100%"/>
 
 **Supervisor: Quality Checks List (all records visible)**
 
-<img src="mvvbv/5.png" width="100%"/>
+<img src="module screenshots/5.png" width="100%"/>
 
 **Supervisor: Review and Remarks (remarks added, ready to send to Manager)**
 
-<img src="mvvbv/6.png" width="100%"/>
+<img src="module screenshots/6.png" width="100%"/>
 
 **Sent to Manager (status moves to Manager)**
 
-<img src="mvvbv/7.png" width="100%"/>
+<img src="module screenshots/7.png" width="100%"/>
 
 **Manager: Quality Checks List (all records visible)**
 
-<img src="mvvbv/8.png" width="100%"/>
+<img src="module screenshots/8.png" width="100%"/>
 
 **Manager: Review and Approve (manager remarks added, ready to approve)**
 
-<img src="mvvbv/9.png" width="100%"/>
+<img src="module screenshots/9.png" width="100%"/>
 
 **Approved: Final Status (full chatter log of the workflow) with using Hide Remarks button**
 
-<img src="mvvbv/10.png" width="100%"/>
+<img src="module screenshots/10.png" width="100%"/>
 
 **Supervisor: Creates Record, Adds QC Product Lines, Fail Result and a Remark**
 
-<img src="mvvbv/11.png" width="100%"/>
+<img src="module screenshots/11.png" width="100%"/>
 
 **Sent to Manager (status moves to Manager) and Manager added remark**
 
-<img src="mvvbv/12.png" width="100%"/>
+<img src="module screenshots/12.png" width="100%"/>
 
 **Failed: Final Status (Manager marks Fail, full chatter log of the workflow)**
 
-<img src="mvvbv/13.png" width="100%"/>
+<img src="module screenshots/13.png" width="100%"/>
 
 ---
 
