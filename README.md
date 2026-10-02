@@ -160,7 +160,7 @@ Remarks are stored in a dedicated model (`quality.check.remark`) instead of a si
 
 ## Screenshots
 
-**Main Checker: Quality Checks List (sees only own records and the records as additional inspector himself), Red: Own state records, Green: Records where added as Additional Inspector**
+**Main Checker: Quality Checks List (sees only own records and the records as additional inspector himself), Red: Own state records, Green: Records where added as Additional Inspector; but not in own state**
 
 <img src="module screenshots/1.png" width="100%"/>
 
