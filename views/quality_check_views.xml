@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_quality_check_tree" model="ir.ui.view">
-        <field name="name">quality.check.tree</field>
+    <record id="view_quality_check_list" model="ir.ui.view">
+        <field name="name">quality.check.list</field>
         <field name="model">quality.check</field>
         <field name="arch" type="xml">
             <!-- Whole row. Red = record is in the current person's own stage (always wins). Green = person is an additional inspector AND record is NOT in own stage. -->
