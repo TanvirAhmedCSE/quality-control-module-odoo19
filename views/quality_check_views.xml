@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="view_quality_check_list" model="ir.ui.view">
         <field name="name">quality.check.list</field>
@@ -118,6 +118,290 @@
         <field name="name">Quality Checks</field>
         <field name="res_model">quality.check</field>
         <field name="view_mode">list,form</field>
+    </record>
+
+</odoo> -->
+
+
+
+
+
+<!-- Remarks in notebook. Added kanban view, search view and more views -->
+
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_quality_check_list" model="ir.ui.view">
+        <field name="name">quality.check.list</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <!-- Whole row. Red = record is in the current person's own stage (always wins). Green = person is an additional inspector AND record is NOT in own stage. -->
+            <list
+                decoration-danger="state == my_stage"
+                decoration-success="is_additional_inspector and state != my_stage">
+                <field name="my_stage" column_invisible="1" />
+                <field name="is_additional_inspector" column_invisible="1" />
+                <field name="name" />
+                <field name="inspector_id" />
+                <field name="check_date" />
+                <field name="result" />
+                <field name="state" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_quality_check_form" model="ir.ui.view">
+        <field name="name">quality.check.form</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send_to_supervisor" string="Send To Supervisor" type="object"
+                        invisible="state != 'draft' or not can_edit" />
+
+                    <button name="action_reset_to_draft" string="Reset To Draft" type="object"
+                        invisible="state != 'supervisor' or origin_state != 'draft' or my_stage != 'draft' or (inspector_id != uid and not is_additional_inspector)" />
+
+                    <button name="action_send_to_manager" string="Send To Manager"
+                        type="object"
+                        invisible="state != 'supervisor'"
+                        groups="quality_control.group_quality_check_supervisor" />
+
+                    <button name="action_reset_to_draft" string="Recall To Draft" type="object"
+                        invisible="state != 'supervisor' or origin_state != 'draft'"
+                        groups="quality_control.group_quality_check_supervisor" />
+
+                    <button name="action_approved" string="Approve" type="object"
+                        invisible="state != 'manager' or result != 'pass'"
+                        groups="quality_control.group_quality_check_manager" />
+
+                    <button name="action_failed" string="Fail" type="object"
+                        invisible="state != 'manager' or result != 'fail'"
+                        groups="quality_control.group_quality_check_manager" />
+
+                    <button name="action_cancel" string="Cancel" type="object"
+                        invisible="state != 'manager'"
+                        groups="quality_control.group_quality_check_manager" />
+
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <!-- Displaying the generated sequence string as the form header -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="my_stage" invisible="1" />
+                            <field name="is_additional_inspector" invisible="1" />
+                            <field name="can_edit" invisible="1" />
+                            <field name="can_add_remark" invisible="1" />
+                            <field name="origin_state" invisible="1" />
+                            <field name="allowed_inspector_ids" invisible="1" />
+                            <field name="name" readonly="not can_edit or state != origin_state" />
+                            <field name="inspector_id" />
+                            <field name="additional_inspector_ids" widget="many2many_tags"
+                                domain="[('id', 'in', allowed_inspector_ids)]"
+                                readonly="not can_edit or state != origin_state" />
+                        </group>
+                        <group>
+                            <field name="check_date" readonly="not can_edit or state != origin_state" />
+                            <field name="result" readonly="not can_edit" />
+                            <field name="state" readonly="1" />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Product Line">
+                            <field name="quantity_lines" readonly="not can_edit">
+                                <list string="Product Line" editable="bottom">
+                                    <field name="product_id" />
+                                    <field name="rec_qty" />
+                                    <field name="damage_qty" />
+                                    <field name="remain_qty" force_save="1" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="All Remarks" invisible="not remarks_html and not can_add_remark">
+                            <div class="d-flex fw-bold border-bottom pb-2">
+                                <div style="width:30%">Person</div>
+                                <div style="width:70%">Remarks</div>
+                            </div>
+                            <field name="remarks_html" nolabel="1" readonly="1"
+                                invisible="not remarks_html" class="w-100" />
+                            <div class="d-flex align-items-start py-2" invisible="not can_add_remark">
+                                <div style="width:30%">
+                                    <field name="my_remarks_label" nolabel="1" class="fw-bold" />
+                                </div>
+                                <div style="width:70%">
+                                    <field name="my_remarks" nolabel="1"
+                                        placeholder="Write your remarks" class="w-100" />
+                                </div>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+
+        </field>
+    </record>
+    <!--  KANBAN  -->
+    <!-- Grouped by state. Dragging is disabled because state changes must go through the buttons. -->
+    <record id="view_quality_check_kanban" model="ir.ui.view">
+        <field name="name">quality.check.kanban</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" group_create="false" quick_create="false"
+                records_draggable="false" group_edit="false" group_delete="false">
+                <field name="name" />
+                <field name="inspector_id" />
+                <field name="check_date" />
+                <field name="result" />
+                <field name="state" />
+                <field name="my_stage" />
+                <field name="is_additional_inspector" />
+                <field name="activity_state" />
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <field name="name" class="fw-bold fs-5" />
+                            <field name="result" widget="badge"
+                                decoration-success="result == 'pass'"
+                                decoration-danger="result == 'fail'" />
+                        </div>
+                        <div class="text-muted mb-1">
+                            <i class="fa fa-calendar me-1" role="img" title="Check Date" />
+                            <field name="check_date" />
+                        </div>
+                        <div class="text-danger fw-bold mb-1" t-if="record.state.raw_value == record.my_stage.raw_value">
+                            Waiting for your action
+                        </div>
+                        <div class="text-success mb-1"
+                            t-if="record.is_additional_inspector.raw_value and record.state.raw_value != record.my_stage.raw_value">
+                            You are an additional inspector
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <field name="activity_ids" widget="kanban_activity" />
+                            <field name="inspector_id" widget="many2one_avatar_user" />
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!--  CALENDAR  -->
+    <record id="view_quality_check_calendar" model="ir.ui.view">
+        <field name="name">quality.check.calendar</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <calendar string="Quality Checks" date_start="check_date" color="inspector_id"
+                mode="month" quick_create="0" hide_time="1">
+                <field name="name" />
+                <field name="inspector_id" filters="1" />
+                <field name="result" />
+                <field name="state" />
+            </calendar>
+        </field>
+    </record>
+
+    <!--  PIVOT  -->
+    <record id="view_quality_check_pivot" model="ir.ui.view">
+        <field name="name">quality.check.pivot</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <pivot string="Quality Checks" sample="1">
+                <field name="state" type="row" />
+                <field name="result" type="col" />
+            </pivot>
+        </field>
+    </record>
+
+    <!--  GRAPH  -->
+    <record id="view_quality_check_graph" model="ir.ui.view">
+        <field name="name">quality.check.graph</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <graph string="Quality Checks" type="bar" stacked="1" sample="1">
+                <field name="state" />
+                <field name="result" />
+            </graph>
+        </field>
+    </record>
+
+    <!--  ACTIVITY  -->
+    <record id="view_quality_check_activity" model="ir.ui.view">
+        <field name="name">quality.check.activity</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <activity string="Quality Checks">
+                <field name="inspector_id" />
+                <field name="state" />
+                <templates>
+                    <div t-name="activity-box" class="d-flex align-items-center gap-2">
+                        <field name="inspector_id" widget="many2one_avatar_user" />
+                        <div>
+                            <field name="name" class="fw-bold" display="full" />
+                            <div class="text-muted">
+                                <field name="state" />
+                            </div>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+
+    <!--  SEARCH  -->
+    <record id="view_quality_check_search" model="ir.ui.view">
+        <field name="name">quality.check.search</field>
+        <field name="model">quality.check</field>
+        <field name="arch" type="xml">
+            <search string="Search Quality Checks">
+                <field name="name" string="Reference" />
+                <field name="inspector_id" />
+                <field name="additional_inspector_ids" />
+                <field name="quantity_lines" string="Product"
+                    filter_domain="[('quantity_lines.product_id', 'ilike', self)]" />
+
+                <filter name="filter_my_checks" string="My Checks"
+                    domain="['|', ('inspector_id', '=', uid), ('additional_inspector_ids', 'in', [uid])]" />
+                <filter name="filter_main_checker" string="I am Main Checker"
+                    domain="[('inspector_id', '=', uid)]" />
+                <filter name="filter_additional" string="I am Additional Inspector"
+                    domain="[('additional_inspector_ids', 'in', [uid])]" />
+                <separator />
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]" />
+                <filter name="filter_supervisor" string="Supervisor" domain="[('state', '=', 'supervisor')]" />
+                <filter name="filter_manager" string="Manager" domain="[('state', '=', 'manager')]" />
+                <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]" />
+                <filter name="filter_failed" string="Failed" domain="[('state', '=', 'failed')]" />
+                <filter name="filter_cancel" string="Cancelled" domain="[('state', '=', 'cancel')]" />
+                <separator />
+                <filter name="filter_pass" string="Result: Pass" domain="[('result', '=', 'pass')]" />
+                <filter name="filter_fail" string="Result: Fail" domain="[('result', '=', 'fail')]" />
+                <separator />
+                <filter name="filter_check_date" string="Check Date" date="check_date" />
+                <separator />
+                <filter name="filter_activities_my" string="My Activities"
+                    domain="[('activity_user_id', '=', uid)]" />
+
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}" />
+                    <filter name="group_result" string="Result" context="{'group_by': 'result'}" />
+                    <filter name="group_inspector" string="Main Checker" context="{'group_by': 'inspector_id'}" />
+                    <filter name="group_check_date" string="Check Date" context="{'group_by': 'check_date:month'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_quality_check" model="ir.actions.act_window">
+        <field name="name">Quality Checks</field>
+        <field name="res_model">quality.check</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph,activity</field>
     </record>
 
 </odoo>
