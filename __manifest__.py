@@ -26,16 +26,17 @@
         'security/record_rules.xml',
         'views/quality_check_views.xml',
         'views/menu.xml',
+        'reports/quality_check_report.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         # 'demo/demo.xml',
     ],
     # JS/XML for the Show/Hide Remarks button
-    'assets': {
-        'web.assets_backend': [
-            'quality_control/static/src/js/remarks_toggle_field.js',
-            'quality_control/static/src/xml/remarks_toggle_field.xml',
-        ],
-    },
+    # 'assets': {
+    #     'web.assets_backend': [
+    #         'quality_control/static/src/js/remarks_toggle_field.js',
+    #         'quality_control/static/src/xml/remarks_toggle_field.xml',
+    #     ],
+    # },
 }
