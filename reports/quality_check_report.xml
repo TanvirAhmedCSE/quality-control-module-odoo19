@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_quality_check" model="ir.actions.report">
+        <field name="name">Quality Check Report</field>
+        <field name="model">quality.check</field>
+        <field name="binding_model_id" ref="model_quality_check" />
+        <field name="binding_type">report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">quality_control.report_quality_check_document</field>
+        <field name="report_file">quality_control.report_quality_check_document</field>
+        <field name="print_report_name">'Quality Check - %s' % (object.name or 'Draft')</field>
+    </record>
+
+    <template id="report_quality_check_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <style>
+                            .qc-bold,
+                            .qc-table thead th,
+                            .qc-products tfoot td,
+                            .qc-products tfoot td span {
+                                font-family: Arial, Helvetica, sans-serif !important;
+                                font-weight: 700 !important;
+                            }
+                            .qc-table { border: 2px solid #1f4e79; }
+                            .qc-table thead th, .qc-table th, .qc-table td { text-align: center !important; vertical-align: middle; }
+                            .qc-table thead th.qc-left, .qc-table th.qc-left, .qc-table td.qc-left { text-align: left !important; }
+                            .qc-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            .qc-products thead th { background-color: #1f4e79; color: #ffffff; }
+                            .qc-products tfoot td { background-color: #d6e6f5; }
+                            .qc-remarks thead th { background-color: #2e7d32; color: #ffffff; }
+                            .qc-remarks td.qc-left { padding: 8px 12px !important; line-height: 1.4; }
+                            .qc-remarks td:not(.qc-left) { padding: 8px !important; vertical-align: middle !important; }
+                            .qc-green { color: #2e7d32 !important; }
+                            .qc-red { color: #c62828 !important; }
+                            .qc-remarks { border: 2px solid #2e7d32 !important; }
+                            .qc-remarks th, .qc-remarks td { border-color: #2e7d32 !important; }
+                            .qc-products th, .qc-products td { border-color: #1f4e79 !important; }
+                            .qc-remarks td:first-child, .qc-remarks td:first-child span {
+                                font-family: Arial, Helvetica, sans-serif !important;
+                                font-weight: 700 !important;
+                            }
+                        </style>
+
+                        <h2 class="mb-4">
+                            Quality Control Check: <span t-field="o.name" />
+                        </h2>
+
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div><span class="qc-bold">Main Checker:</span> <span t-field="o.inspector_id" /></div>
+                                <div>
+                                    <span class="qc-bold">Additional Inspectors:</span>
+                                    <span t-out="', '.join(o.additional_inspector_ids.mapped('name')) or '-'" />
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div><span class="qc-bold">Check Date:</span> <span t-field="o.check_date" /></div>
+                                <div><span class="qc-bold">Result:</span> <span t-field="o.result" t-att-class="'qc-green' if o.result == 'pass' else 'qc-red' if o.result == 'fail' else ''" /></div>
+                                <div><span class="qc-bold">Status:</span> <span t-field="o.state" t-att-class="'qc-green' if o.state == 'approved' else 'qc-red' if o.state in ('failed', 'cancel') else ''" /></div>
+                            </div>
+                        </div>
+
+                        <h4>Product Lines</h4>
+                        <table class="table table-sm table-bordered qc-table qc-products">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Receive Qty</th>
+                                    <th>Damage Qty</th>
+                                    <th>Remain Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.quantity_lines" t-as="line"
+                                    t-att-style="'background-color: #eaf2fa;' if line_index % 2 else ''">
+                                    <td><span t-field="line.product_id" /></td>
+                                    <td><span t-field="line.rec_qty" /></td>
+                                    <td><span t-field="line.damage_qty" /></td>
+                                    <td><span t-field="line.remain_qty" /></td>
+                                </tr>
+                                <tr t-if="not o.quantity_lines">
+                                    <td colspan="4" class="text-muted">No product lines.</td>
+                                </tr>
+                            </tbody>
+                            <tfoot t-if="o.quantity_lines">
+                                <tr>
+                                    <td>Total</td>
+                                    <td><span t-out="sum(o.quantity_lines.mapped('rec_qty'))" /></td>
+                                    <td><span t-out="sum(o.quantity_lines.mapped('damage_qty'))" /></td>
+                                    <td><span t-out="sum(o.quantity_lines.mapped('remain_qty'))" /></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <h4 class="mt-4">Remarks</h4>
+                        <table class="table table-sm table-bordered qc-table qc-remarks">
+                            <thead>
+                                <tr>
+                                    <th style="width:30%">Person</th>
+                                    <th style="width:15%">Role</th>
+                                    <th style="width:55%">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.remark_ids.sorted('id')" t-as="remark"
+                                    t-att-style="'background-color: #eaf6eb;' if remark_index % 2 else ''">
+                                    <td><span t-field="remark.user_id" /></td>
+                                    <td><span t-field="remark.stage" /></td>
+                                    <td class="qc-left" style="white-space: pre-wrap;"><span t-field="remark.remarks" /></td>
+                                </tr>
+                                <tr t-if="not o.remark_ids">
+                                    <td colspan="3" class="text-muted" style="font-weight: 400 !important;">No remarks.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
